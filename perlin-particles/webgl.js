@@ -1,8 +1,9 @@
 import * as THREE from 'three';
 import vertex from './shaders/vertex.glsl'
 import fragment from './shaders/fragment.glsl'
-import { AdditiveBlending, Blending } from 'three';
-import { clamp } from 'three/src/math/MathUtils';
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 
 let OrbitControls = require("three/examples/jsm/controls/OrbitControls").OrbitControls
 
@@ -27,7 +28,8 @@ export default class Sketch{
             0.001, 
             1000
         );
-        this.camera.position.z = 7;
+        this.camera.position.z = 3;
+       
 
         this.scene = new THREE.Scene();
         this.control = new OrbitControls(this.camera, this.renderer.domElement)
@@ -54,12 +56,29 @@ export default class Sketch{
             this.mouseY = (e.pageY-this.height/2)*.001;
             lastX = e.pageX;
             lastY = e.pageY;
-            console.log(this.mouseSpeed);
             // mousemove
         })
     }
 
     addPost(){
+        this.params = {
+            exposure: 1,
+            bloomStrength: 2.5,
+            bloomThreshold: 0,
+            bloomRadius: .5
+        };
+
+        this.renderScene = new RenderPass( this.scene, this.camera );
+
+		this.bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
+		this.bloomPass.threshold = this.params.bloomThreshold;
+		this.bloomPass.strength = this.params.bloomStrength;
+		this.bloomPass.radius = this.params.bloomRadius;
+
+		this.composer = new EffectComposer( this.renderer );
+		this.composer.addPass( this.renderScene );
+		this.composer.addPass( this.bloomPass );
+
 
     }
 
@@ -90,7 +109,6 @@ export default class Sketch{
         
         this.geometry.addAttribute('aRandom', new Float32Array(this.rand), 1)
 
-        console.log(this.geometry)
         this.mesh = new THREE.Points( this.geometry, this.material );
         this.scene.add( this.mesh );
     }
@@ -108,17 +126,17 @@ export default class Sketch{
     render(){
         this.time++;
         this.mouseSpeed *= .95;
-
-        this.scene.rotation.x = this.time / 2000;
-	    this.scene.rotation.y = this.time / 1000;
+        this.mesh.rotation.z = this.time / 2000;
+	    this.mesh.rotation.y = this.time / 1000;
 
         this.material.uniforms['uMouseX'].value = this.mouseX;
         this.material.uniforms['uMouseY'].value = this.mouseY;
 
-        this.camera.position.z += this.mouseX*this.mouseSpeed*.1;
+        // this.camera.position.z += this.mouseX*this.mouseSpeed*.1;
 
         this.control.update();
-        this.renderer.render( this.scene, this.camera );
+        // this.renderer.render( this.scene, this.camera );
+        this.composer.render();
         
         window.requestAnimationFrame(this.render.bind(this))
     }

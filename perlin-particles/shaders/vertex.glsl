@@ -128,18 +128,37 @@ void main() {
   float dist = abs(position.x - uMouseX) + abs(position.y - uMouseY);
   dist *= dist;
 
-  float f = 1.;
-  float amplitude =  5.5;
+  float f = 2.;
+  float amplitude =  10.5;
   vec3 newPos = vNormal*f;
 
-  vec3 noisy = curlNoise(position+(.1)*newPos)*normal*amplitude;
+  vec3 noisy = curlNoise(position+(.5)*newPos)*normal*amplitude;
 
-  vec3 newPosition = position + noisy*aRandom*(1.);
+  vec3 newPosition = position + noisy*(aRandom*.1);
+
+  // 一个还不错的效果
+  newPosition = position + step(noisy*(aRandom-.1),vNormal);
+
+
+  // newPosition = position + step(noisy*(aRandom-.1),noisy);
+
+  newPosition = position +smoothstep(noisy*(aRandom-.1),noisy+vNormal, noisy);
+  newPosition.x -= .5;
+  newPosition.y -= .5;
+  newPosition.z -= .5;
+
+  // newPosition.y = -newPosition.y;
+  // newPosition.x = -newPosition.x;
+
+  // to ball
+  // newPosition = normalize(newPosition);
+
+
   // newPosition = position;
 
 
   vec4 mvPosition = modelViewMatrix * vec4( newPosition, 1.0 );
   gl_Position = projectionMatrix * mvPosition;
-  gl_PointSize = (50.-dist*5.) / (1. -mvPosition.z);
+  gl_PointSize = (20.-dist*5.) / (1. -mvPosition.z);
   // gl_PointSize = step(1.-(1./512.), newPosition.x) * 3.;
 }
