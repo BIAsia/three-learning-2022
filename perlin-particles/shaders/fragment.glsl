@@ -8,8 +8,10 @@ void main() {
     vec2 cUv = 2. * uv - 1.;
     
     float disc = length(cUv);
-    vec3 rgb = vec3(0., 1. - disc, 1. - disc);
-    gl_FragColor = vec4(rgb, 1.)*vRandom;
+    vec3 rgb = vec3(0., .7 - disc - (vPosition.x)*.2 + vRandom*.1, .9 - disc + vRandom*.2);
+    float alpha = 1.-disc;
+
+    gl_FragColor = vec4(rgb, alpha)*(1.-vRandom);
 
 }
 

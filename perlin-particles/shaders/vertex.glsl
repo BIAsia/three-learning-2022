@@ -5,6 +5,9 @@ varying float vRandom;
 
 attribute float aRandom;
 
+uniform float uMouseX;
+uniform float uMouseY;
+
 //	Simplex 3D Noise 
 //	by Ian McEwan, Ashima Arts
 //
@@ -122,18 +125,21 @@ void main() {
   vRandom = aRandom;
   vNormal = normalize(normal*normalMatrix);
 
-  float f = 2.;
-  float amplitude =  2.;
+  float dist = abs(position.x - uMouseX) + abs(position.y - uMouseY);
+  dist *= dist;
+
+  float f = 1.;
+  float amplitude =  5.5;
   vec3 newPos = vNormal*f;
 
-  vec3 noisy = curlNoise(position+.02*newPos)*normal*amplitude;
+  vec3 noisy = curlNoise(position+(.1)*newPos)*normal*amplitude;
 
-  vec3 newPosition = position + noisy*aRandom;
+  vec3 newPosition = position + noisy*aRandom*(1.);
   // newPosition = position;
 
 
   vec4 mvPosition = modelViewMatrix * vec4( newPosition, 1.0 );
   gl_Position = projectionMatrix * mvPosition;
-  gl_PointSize = 20. / (10. -mvPosition.z);
+  gl_PointSize = (50.-dist*5.) / (1. -mvPosition.z);
   // gl_PointSize = step(1.-(1./512.), newPosition.x) * 3.;
 }

@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import vertex from './shaders/vertex.glsl'
 import fragment from './shaders/fragment.glsl'
 import { AdditiveBlending, Blending } from 'three';
+import { clamp } from 'three/src/math/MathUtils';
 
 let OrbitControls = require("three/examples/jsm/controls/OrbitControls").OrbitControls
 
@@ -14,7 +15,7 @@ export default class Sketch{
         this.renderer = new THREE.WebGLRenderer( { antialias: true } );
         this.renderer.setPixelRatio(window.devicePixelRatio);
         this.renderer.setSize( this.width, this.height );
-        this.renderer.setClearColor(0x111111,1)
+        this.renderer.setClearColor(0x000000,1)
         this.renderer.physicallyCorrectLights = true;
         this.renderer.outputEncoding = THREE.sRGBEncoding;
 
@@ -26,12 +27,16 @@ export default class Sketch{
             0.001, 
             1000
         );
-        this.camera.position.z = 4;
+        this.camera.position.z = 7;
 
         this.scene = new THREE.Scene();
         this.control = new OrbitControls(this.camera, this.renderer.domElement)
         this.time = 0;
         this.mouse = 0;
+        this.mouseX = 0;
+        this.mouseY = 0;
+        this.mouseSpeed = 0;
+
 
         this.addMesh();
         this.mouseEvent();
@@ -42,7 +47,14 @@ export default class Sketch{
 
     }
     mouseEvent(){
+        let lastX = 0, lastY = 0;
         document.addEventListener('mousemove', (e)=>{
+            this.mouseSpeed = .05*Math.sqrt((e.pageX - lastX)**2 + (e.pageY - lastY)**2)
+            this.mouseX = (e.pageX-this.width/2)*.001;
+            this.mouseY = (e.pageY-this.height/2)*.001;
+            lastX = e.pageX;
+            lastY = e.pageY;
+            console.log(this.mouseSpeed);
             // mousemove
         })
     }
@@ -59,14 +71,15 @@ export default class Sketch{
             fragmentShader: fragment,
             
             uniforms: {
-                
+                uMouseX: {value: this.mouseX},
+                uMouseY: {value: this.mouseY}
             },
-            // side: THREE.DoubleSide,
+            side: THREE.DoubleSide,
             transparent: true,
             depthWrite: true,
             depthTest: true,
             // wireframe: true,
-            // blending: THREE.AdditiveBlending
+            blending: THREE.AdditiveBlending
         })
 
         this.rand = []
@@ -94,9 +107,15 @@ export default class Sketch{
 
     render(){
         this.time++;
-        
+        this.mouseSpeed *= .95;
+
         this.scene.rotation.x = this.time / 2000;
 	    this.scene.rotation.y = this.time / 1000;
+
+        this.material.uniforms['uMouseX'].value = this.mouseX;
+        this.material.uniforms['uMouseY'].value = this.mouseY;
+
+        this.camera.position.z += this.mouseX*this.mouseSpeed*.1;
 
         this.control.update();
         this.renderer.render( this.scene, this.camera );
