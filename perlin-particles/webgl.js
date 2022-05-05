@@ -28,7 +28,7 @@ export default class Sketch{
             0.001, 
             1000
         );
-        this.camera.position.z = 3;
+        this.camera.position.z = 6;
        
 
         this.scene = new THREE.Scene();
@@ -84,7 +84,7 @@ export default class Sketch{
 
     addMesh(){
         this.geometry = new THREE.IcosahedronBufferGeometry(1,36);
-
+        // this.geometry = new THREE.BoxBufferGeometry(1,1,1,56,56,56)
         this.material = new THREE.ShaderMaterial({
             vertexShader: vertex,
             fragmentShader: fragment,

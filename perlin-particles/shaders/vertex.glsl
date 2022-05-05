@@ -137,7 +137,7 @@ void main() {
   vec3 newPosition = position + noisy*(aRandom*.1);
 
   // 一个还不错的效果
-  newPosition = position + step(noisy*(aRandom-.1),vNormal);
+  // newPosition = position + step(noisy*(aRandom-.1),vNormal);
 
 
   // newPosition = position + step(noisy*(aRandom-.1),noisy);
@@ -151,7 +151,9 @@ void main() {
   // newPosition.x = -newPosition.x;
 
   // to ball
-  // newPosition = normalize(newPosition);
+  newPosition = normalize(newPosition) + newPosition;
+
+  newPosition = newPosition + smoothstep(noisy*(aRandom-.1),noisy+vNormal, noisy);
 
 
   // newPosition = position;
