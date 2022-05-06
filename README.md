@@ -18,3 +18,24 @@ mostly following Yuri's tutorial/stream
     - refracted
     - apply texture
 
+### perlin-particles
+- three
+    - bloomPass
+    - mouseEvent: mousemove
+    - Points -> particle
+    - particle style adjustment
+- glsl
+    - disc: to make particles round
+    - noise func (curl, snoise)
+    - dist: to make mouse interactions
+    - smoothstep, step, mix
+
+### color-noisy
+- three
+    - tCube: CubeRenderTarget, CubeCamera
+- glsl
+    - refract & reflect
+    - line shape texture
+    - rotate2D
+    - mix color with pattern
+    - noise func (using Gelfond's constant)
