@@ -43,8 +43,9 @@ export default class Sketch{
 
         this.addMesh();
         this.mouseEvent();
-        this.resize();
+        
         this.addPost();
+        this.resize();
         this.render();
         this.setupResize();
 
