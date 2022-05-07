@@ -1,0 +1,19 @@
+{
+  "name": "start-template",
+  "version": "1.0.0",
+  "description": "",
+  "main": "webgl.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "parcel serve index.html --port 8888 --open"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "parcel": "^2.5.0",
+    "three": "^0.140.0"
+  },
+  "devDependencies": {
+    "@parcel/transformer-glsl": "^2.5.0"
+  }
+}
