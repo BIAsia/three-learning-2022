@@ -8,20 +8,30 @@ import backImg from './resources/image1.png'
 import frontImg from './resources/image2.png'
 import blob from './resources/blob.png'
 
+function range(a,b){
+    let r = Math.random();
+    return (a*r + b*(1-r));
+}
+
 export default class Sketch{
     constructor(){
         this.container = document.getElementById('container');
         this.width = this.container.offsetWidth;
         this.height = this.container.offsetHeight;
 
-        this.renderer = new THREE.WebGLRenderer( { antialias: true } );
+        this.renderer = new THREE.WebGLRenderer( {
+             antialias: true,
+             alpha: true 
+        } );
         this.renderer.setPixelRatio(window.devicePixelRatio);
         this.renderer.setSize( this.width, this.height );
-        this.renderer.setClearColor(0x111111,1)
-        this.renderer.physicallyCorrectLights = true;
+        // this.renderer.setClearColor(0x111111,1)
+        // this.renderer.physicallyCorrectLights = true;
         this.renderer.outputEncoding = THREE.sRGBEncoding;
 
         this.container.appendChild( this.renderer.domElement );
+
+        this.renderTarget = new THREE.WebGLRenderTarget(this.width, this.height, {});
 
         this.raycaster = new THREE.Raycaster();
         this.pointer = new THREE.Vector2();
@@ -36,10 +46,19 @@ export default class Sketch{
         this.camera.position.z = 2;
 
         this.scene = new THREE.Scene();
+        this.sceneBlob = new THREE.Scene();
         this.control = new OrbitControls(this.camera, this.renderer.domElement)
         this.time = 0;
         this.mouse = 0;
 
+        this.textures = [];
+        this.textures.push(
+            new THREE.TextureLoader().load(backImg),
+            new THREE.TextureLoader().load(frontImg),
+            new THREE.TextureLoader().load(blob),
+        )
+
+        this.addBlobs();
         this.addMesh();
         this.mouseEvent();
         this.resize();
@@ -48,6 +67,52 @@ export default class Sketch{
         this.setupResize();
         this.raycasterEvent();
 
+    }
+
+    addBlobs(){
+        let number = 50;
+        let meshBlob = new THREE.Mesh(
+            new THREE.PlaneBufferGeometry(.2, .2),
+            new THREE.MeshBasicMaterial({
+                map: this.textures[2],
+                transparent: true,
+                blending: THREE.AdditiveBlending,
+                depthTest: false,
+                depthWrite: false,
+            })
+        )
+        meshBlob.position.z = .2;
+
+        this.blobs = [];
+
+        // this.scene.add(meshBlob)
+        for (let i = 0; i < number; i++) {
+            let b = meshBlob.clone();
+            
+            let theta = range(0,2*Math.PI)
+            let r = range(.0, .05)
+            b.position.x = r*Math.sin(theta)
+            b.position.y = r*Math.cos(theta)
+            b.userData.life = range(-2*Math.PI, 2*Math.PI)
+            this.blobs.push(b);
+            this.sceneBlob.add(b)
+        }
+    }
+
+    updateBlobs(){
+        this.blobs.forEach(b=>{
+            b.userData.life += .2;
+            b.scale.setScalar(Math.sin(.5*b.userData.life))
+
+            if(b.userData.life > 2*Math.PI){
+                b.userData.life =- 2*Math.PI;
+
+                let theta = range(0,2*Math.PI)
+                let r = range(.05, .1)
+                b.position.x = this.point.x + r*Math.sin(theta)
+                b.position.y = this.point.y + r*Math.cos(theta)
+            }
+        })
     }
 
     raycasterEvent(){
@@ -79,13 +144,6 @@ export default class Sketch{
     }
 
     addMesh(){
-        this.textures = [];
-        this.textures.push(
-            new THREE.TextureLoader().load(backImg),
-            new THREE.TextureLoader().load(frontImg),
-            new THREE.TextureLoader().load(blob),
-        )
-
         this.geometry = new THREE.PlaneBufferGeometry(1,1);
 
         this.material = new THREE.ShaderMaterial({
@@ -95,7 +153,7 @@ export default class Sketch{
             uniforms: {
                 uMouse: {value: 0},
                 // progress: {type: "f", value: 0},
-                uImg: {value: this.textures[1]},
+                uImg: {value: this.textures[0]},
                 uMask: {value: this.textures[2]},
                 uResolution: {value: new THREE.Vector4()},
                 // uTime: {value: 0},
@@ -114,7 +172,7 @@ export default class Sketch{
         this.bgMesh = new THREE.Mesh(
             new THREE.PlaneBufferGeometry(3,2),
             new THREE.MeshBasicMaterial({
-                map: this.textures[0],
+                map: this.textures[1],
             })
         )
         this.scene.add(this.bgMesh);
@@ -163,6 +221,13 @@ export default class Sketch{
         this.time++;
 
         this.control.update();
+        this.updateBlobs()
+
+        this.renderer.setRenderTarget(this.renderTarget)
+        this.renderer.render(this.sceneBlob, this.camera)
+        this.material.uniforms.uMask.value = this.renderTarget.texture
+        this.renderer.setRenderTarget(null)
+
         this.renderer.render( this.scene, this.camera );
         
         window.requestAnimationFrame(this.render.bind(this))

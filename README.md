@@ -39,3 +39,14 @@ mostly following Yuri's tutorial/stream
     - rotate2D
     - mix color with pattern
     - noise func (using Gelfond's constant)
+
+
+### mask-tracking
+- three
+    - multi scenes overlay with mask
+    - raycaster to get mouse point in 3D
+    - metaball like mouse tracking
+    - image fit window
+- glsl
+    - keep texture ratio
+    - edge effect
