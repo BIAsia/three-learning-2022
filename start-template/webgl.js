@@ -25,6 +25,20 @@ export default class Sketch{
             0.001, 
             1000
         );
+
+        var frustumSize = 1;
+        var aspect = this.width/this.height;
+        this.camera = new THREE.OrthographicCamera(
+            frustumSize / -2,
+            frustumSize / 2,
+            frustumSize / 2,
+            frustumSize / -2,
+            -1000,
+            1000 
+        );
+        console.log("changed")
+
+
         this.camera.position.z = 2;
 
         this.scene = new THREE.Scene();
@@ -87,8 +101,8 @@ export default class Sketch{
     render(){
         this.time++;
         
-        this.scene.rotation.x = this.time / 2000;
-	    this.scene.rotation.y = this.time / 1000;
+        // this.scene.rotation.x = this.time / 2000;
+	    // this.scene.rotation.y = this.time / 1000;
 
         this.control.update();
         this.renderer.render( this.scene, this.camera );
