@@ -26,6 +26,23 @@ export default class Sketch{
             1000
         );
 
+        // this.isometricFill();
+        this.camera.position.z = 2;
+
+        this.scene = new THREE.Scene();
+        this.control = new OrbitControls(this.camera, this.renderer.domElement)
+        this.time = 0;
+        this.mouse = 0;
+
+        this.addMesh();
+        // this.mouseEvent();
+        this.resize();
+        // this.addPost();
+        this.render();
+        this.setupResize();
+
+    }
+    isometricFill(){
         var frustumSize = 1;
         var aspect = this.width/this.height;
         this.camera = new THREE.OrthographicCamera(
@@ -36,24 +53,8 @@ export default class Sketch{
             -1000,
             1000 
         );
-        console.log("changed")
-
-
-        this.camera.position.z = 2;
-
-        this.scene = new THREE.Scene();
-        this.control = new OrbitControls(this.camera, this.renderer.domElement)
-        this.time = 0;
-        this.mouse = 0;
-
-        this.addMesh();
-        this.mouseEvent();
-        this.resize();
-        this.addPost();
-        this.render();
-        this.setupResize();
-
     }
+
     mouseEvent(){
         document.addEventListener('mousemove', (e)=>{
             // mousemove
