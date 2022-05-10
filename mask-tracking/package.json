@@ -1,11 +1,11 @@
 {
-  "name": "start-template",
+  "name": "mask-tracking",
   "version": "1.0.0",
   "description": "",
-  "main": "webgl.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "parcel serve index.html --port 8888 --open"
+    "start": "parcel serve index.html --port 8888 --open",
+    "build": "rm -rf ./dist; parcel build index.html --public-url '.' --no-source-maps;parcel serve index.html --port 8888"
   },
   "author": "",
   "license": "ISC",
