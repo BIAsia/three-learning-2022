@@ -50,3 +50,12 @@ mostly following Yuri's tutorial/stream
 - glsl
     - keep texture ratio
     - edge effect
+
+
+### pixelated-distortion
+- three
+    - isometric camera: OrthographicCamera
+    - mouseEvent: position & speed
+    - DataTexture: pixel style & animation
+- glsl
+    - use dataTexture as offset
