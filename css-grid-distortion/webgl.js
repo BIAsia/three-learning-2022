@@ -5,6 +5,8 @@ import fragment from './shaders/fragment.glsl'
 
 let OrbitControls = require("three/examples/jsm/controls/OrbitControls").OrbitControls
 
+import text from './resources/text.png'
+
 export default class Sketch{
     constructor(){
         this.container = document.getElementById('container');
@@ -14,7 +16,7 @@ export default class Sketch{
         this.renderer = new THREE.WebGLRenderer( { antialias: true } );
         this.renderer.setPixelRatio(window.devicePixelRatio);
         this.renderer.setSize( this.width, this.height );
-        this.renderer.setClearColor(0x111111,1)
+        this.renderer.setClearColor(0x000000,1)
         this.renderer.physicallyCorrectLights = true;
         this.renderer.outputEncoding = THREE.sRGBEncoding;
 
@@ -27,7 +29,7 @@ export default class Sketch{
             1000
         );
 
-        // this.isometricFill();
+        this.isometricFill();
         this.camera.position.z = 2;
 
         this.scene = new THREE.Scene();
@@ -44,18 +46,6 @@ export default class Sketch{
         this.setupResize();
 
     }
-    isometricFill(){
-        var frustumSize = 1;
-        var aspect = this.width/this.height;
-        this.camera = new THREE.OrthographicCamera(
-            frustumSize / -2,
-            frustumSize / 2,
-            frustumSize / 2,
-            frustumSize / -2,
-            -1000,
-            1000 
-        );
-    }
 
     settings(){
         this.pane = new Pane();
@@ -68,6 +58,19 @@ export default class Sketch{
         ).on('change', (ev)=>{
             this.material.uniforms.uProgress.value = ev.value;
         })
+    }
+
+    isometricFill(){
+        var frustumSize = 1;
+        var aspect = this.width/this.height;
+        this.camera = new THREE.OrthographicCamera(
+            frustumSize / -2,
+            frustumSize / 2,
+            frustumSize / 2,
+            frustumSize / -2,
+            -1000,
+            1000 
+        );
     }
 
     mouseEvent(){
@@ -83,6 +86,10 @@ export default class Sketch{
     addMesh(){
         this.geometry = new THREE.PlaneBufferGeometry(1,1);
 
+        let textureText = new THREE.TextureLoader().load(text);
+        // reduce img border
+        textureText.magFilter = textureText.minFilter = THREE.NearestFilter;
+
         this.material = new THREE.ShaderMaterial({
             vertexShader: vertex,
             fragmentShader: fragment,
@@ -91,7 +98,7 @@ export default class Sketch{
                 uMouse: {value: 0},
                 uResolution: {value: new THREE.Vector2()},
                 uProgress: {value: 0},
-                uImg: {value: this.texture},
+                uImg: {value: textureText},
                 uTime: {value: 0},
                 // uSize: {value: 6.0},
                 // uScale: {value: 0}
@@ -116,6 +123,7 @@ export default class Sketch{
 
         this.material.uniforms.uResolution.value.x = this.width;
         this.material.uniforms.uResolution.value.y = this.height;
+
     }
 
     render(){
@@ -124,6 +132,7 @@ export default class Sketch{
         // this.scene.rotation.x = this.time / 2000;
 	    // this.scene.rotation.y = this.time / 1000;
         this.material.uniforms.uTime.value = this.time;
+        // this.material.uniforms.uProgress.value = this.pane.;
         this.control.update();
         this.renderer.render( this.scene, this.camera );
         

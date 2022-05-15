@@ -1,10 +1,10 @@
 {
-  "name": "start-template",
+  "name": "css-grid-distortion",
   "version": "1.0.0",
   "description": "",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "rm -rf ./dist; rm -rf ./.parcel-cache; parcel serve index.html --port 8888 --open",
+    "start": "rm -rf ./dist; parcel index.html --port 8888 --open",
     "build": "rm -rf ./dist; parcel build index.html --public-url '.' --no-source-maps;parcel serve index.html --port 8888"
   },
   "author": "",
