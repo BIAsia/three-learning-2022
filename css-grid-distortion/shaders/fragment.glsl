@@ -36,7 +36,7 @@ void main() {
     vec2 scale = vec2(1. + .1*shade, 1.+ .5*shade);
     vec2 scaleCenter = vec2(.5, steps - .1);
 
-    newUV = (newUV - scaleCenter)*(scale - .4*(1.-uProgress)) + scaleCenter;
+    newUV = (newUV - scaleCenter)*(scale - .6*(1.-uProgress)) + scaleCenter;
 
 
     // scroll through time & progress

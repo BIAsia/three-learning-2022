@@ -1,11 +1,12 @@
 import * as THREE from 'three';
+import {Pane} from 'tweakpane';
 import vertex from './shaders/vertex.glsl'
 import fragment from './shaders/fragment.glsl'
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 
-let OrbitControls = require("three/examples/jsm/controls/OrbitControls").OrbitControls
+// let OrbitControls = require("three/examples/jsm/controls/OrbitControls").OrbitControls
 
 export default class Sketch{
     constructor(){
@@ -28,11 +29,12 @@ export default class Sketch{
             0.001, 
             1000
         );
-        this.camera.position.z = 6;
+        this.camera.position.z = 3;
+        this.rotateSpeed = 1;
        
 
         this.scene = new THREE.Scene();
-        this.control = new OrbitControls(this.camera, this.renderer.domElement)
+        // this.control = new OrbitControls(this.camera, this.renderer.domElement)
         this.time = 0;
         this.mouse = 0;
         this.mouseX = 0;
@@ -41,6 +43,7 @@ export default class Sketch{
 
 
         this.addMesh();
+        this.settings();
         this.mouseEvent();
         this.resize();
         this.addPost();
@@ -82,6 +85,61 @@ export default class Sketch{
 
     }
 
+    settings(){
+        this.pane = new Pane();
+        
+
+
+        this.PARAMS = {
+            exposure: 1,
+            strength: 2.5,
+            threshold: 0,
+            radius: .5,
+            speed: 2.,
+            amplitude: 10.5,
+            rgb: {r:0, g:178, b:230},
+            scale: .4,
+            x: 0,
+            y: 1,
+            z: 0,
+            rotate: 1,
+        };
+
+        
+
+        const colorFolder = this.pane.addFolder({
+            title: 'Color',
+            expanded: true,
+        });
+
+
+        colorFolder.addInput(this.PARAMS, 'rgb').on('change', (ev)=>{this.material.uniforms.uRGB.value = ev.value;});
+        colorFolder.addInput(this.PARAMS, 'x',{min: -1, max: 1}).on('change', (ev)=>{this.material.uniforms.uTrans.value.x = ev.value;});
+        colorFolder.addInput(this.PARAMS, 'y',{min: -1, max: 1}).on('change', (ev)=>{this.material.uniforms.uTrans.value.y = ev.value;});
+        colorFolder.addInput(this.PARAMS, 'z',{min: -1, max: 1}).on('change', (ev)=>{this.material.uniforms.uTrans.value.z = ev.value;});
+        colorFolder.addInput(this.PARAMS, 'scale',{min: 0, max: 1}).on('change', (ev)=>{this.material.uniforms.uScale.value = ev.value;});
+
+        const bloomFolder = this.pane.addFolder({
+            title: 'Bloom',
+            expanded: true,
+        });
+          
+        // f.addInput(this.PARAMS, 'exposure').on('change', (ev)=>{});
+        bloomFolder.addInput(this.PARAMS, 'strength',{min: 0, max: 10}).on('change', (ev)=>{this.bloomPass.strength = ev.value;});
+        // f.addInput(this.PARAMS, 'bloomThreshold').on('change', (ev)=>{this.bloomPass.threshold = ev.value;});
+        bloomFolder.addInput(this.PARAMS, 'radius',{min: 0, max: 5}).on('change', (ev)=>{this.bloomPass.radius = ev.value;});
+
+        const vertexFolder = this.pane.addFolder({
+            title: 'Vertex',
+            expanded: true,
+        });
+          
+        vertexFolder.addInput(this.PARAMS, 'speed',{min: 0, max: 5}).on('change', (ev)=>{this.material.uniforms.uSpeed.value = ev.value;});
+        vertexFolder.addInput(this.PARAMS, 'amplitude').on('change', (ev)=>{this.material.uniforms.uAmplitude.value = ev.value;});
+
+        this.pane.addInput(this.PARAMS, 'rotate',{min: -5, max: 5}).on('change', (ev)=>{this.rotateSpeed = ev.value;});
+    }
+
     addMesh(){
         this.geometry = new THREE.IcosahedronBufferGeometry(1,36);
         // this.geometry = new THREE.BoxBufferGeometry(1,1,1,56,56,56)
@@ -91,7 +149,12 @@ export default class Sketch{
             
             uniforms: {
                 uMouseX: {value: this.mouseX},
-                uMouseY: {value: this.mouseY}
+                uMouseY: {value: this.mouseY},
+                uSpeed: {value: 2.},
+                uAmplitude: {value: 10.5},
+                uRGB: {value: {r:0, g:178, b:230}},
+                uScale: {value: .4},
+                uTrans: {value: {x:0, y:1, z:0}},
             },
             side: THREE.DoubleSide,
             transparent: true,
@@ -126,15 +189,16 @@ export default class Sketch{
     render(){
         this.time++;
         this.mouseSpeed *= .95;
-        this.mesh.rotation.z = this.time / 2000;
-	    this.mesh.rotation.y = this.time / 1000;
+        
+        this.mesh.rotation.z = this.time / 2000 * this.rotateSpeed;
+	    this.mesh.rotation.y = this.time / 1000 * this.rotateSpeed;
 
         this.material.uniforms['uMouseX'].value = this.mouseX;
         this.material.uniforms['uMouseY'].value = this.mouseY;
 
         // this.camera.position.z += this.mouseX*this.mouseSpeed*.1;
 
-        this.control.update();
+        // this.control.update();
         // this.renderer.render( this.scene, this.camera );
         this.composer.render();
         

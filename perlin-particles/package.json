@@ -4,16 +4,18 @@
   "description": "",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "parcel serve index.html --port 8888 --open",
-    "build": "rm -rf ./dist; parcel build index.html --public-url '.' --no-source-maps;parcel serve index.html --port 8888"
+    "start": "rm -rf ./dist; rm -rf ./.parcel-cache; parcel serve index.html --port 8888 --open",
+    "build": "rm -rf ./dist; parcel build index.html --public-url '.' --no-source-maps;parcel serve index.html --port 9999"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "parcel": "^2.5.0",
-    "three": "^0.140.0"
+    "three": "^0.140.0",
+    "tweakpane": "^3.0.8"
   },
   "devDependencies": {
-    "@parcel/transformer-glsl": "^2.5.0"
+    "@parcel/transformer-glsl": "^2.5.0",
+    "@tweakpane/core": "^1.0.9"
   }
 }

@@ -2,11 +2,21 @@ varying vec3 vPosition;
 varying vec2 vUV;
 varying vec3 vNormal;
 varying float vRandom;
+varying vec3 vRGB;
+varying float vScale;
+varying vec3 vTrans;
+
 
 attribute float aRandom;
 
 uniform float uMouseX;
 uniform float uMouseY;
+uniform float uSpeed;
+uniform float uAmplitude;
+uniform vec3 uRGB;
+uniform float uScale;
+uniform vec3 uTrans;
+
 
 //	Simplex 3D Noise 
 //	by Ian McEwan, Ashima Arts
@@ -119,6 +129,9 @@ vec3 curlNoise( vec3 p ){
 
 
 void main() {
+  vTrans = uTrans;
+  vScale = uScale;
+  vRGB = uRGB;
   vPosition = position;
   vUV = uv;
   vNormal = normal;
@@ -128,8 +141,8 @@ void main() {
   float dist = abs(position.x - uMouseX) + abs(position.y - uMouseY);
   dist *= dist;
 
-  float f = 2.;
-  float amplitude =  10.5;
+  float f = uSpeed;
+  float amplitude =  uAmplitude;
   vec3 newPos = vNormal*f;
 
   vec3 noisy = curlNoise(position+(.5)*newPos)*normal*amplitude;
@@ -142,18 +155,13 @@ void main() {
 
   // newPosition = position + step(noisy*(aRandom-.1),noisy);
 
-  newPosition = position +smoothstep(noisy*(aRandom-.1),noisy+vNormal, noisy);
-  newPosition.x -= .5;
-  newPosition.y -= .5;
-  newPosition.z -= .5;
-
   // newPosition.y = -newPosition.y;
   // newPosition.x = -newPosition.x;
 
   // to ball
   newPosition = normalize(newPosition) + newPosition;
 
-  newPosition = newPosition + smoothstep(noisy*(aRandom-.1),noisy+vNormal, noisy);
+  // newPosition = newPosition + .5*smoothstep(noisy*(aRandom-.1),noisy+vNormal, noisy);
 
 
   // newPosition = position;

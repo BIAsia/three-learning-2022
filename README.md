@@ -24,6 +24,7 @@ mostly following Yuri's tutorial/stream
     - mouseEvent: mousemove
     - Points -> particle
     - particle style adjustment
+    - add tweakpane
 - glsl
     - disc: to make particles round
     - noise func (curl, snoise)
