@@ -25,6 +25,7 @@ mostly following Yuri's tutorial/stream
     - Points -> particle
     - particle style adjustment
     - add tweakpane
+    - add ccapture
 - glsl
     - disc: to make particles round
     - noise func (curl, snoise)

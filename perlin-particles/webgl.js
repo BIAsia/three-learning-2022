@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import {CCapture} from 'ccapture.js';
+import {CCapture} from 'ccapture.js-npmfixed';
 import {Pane} from 'tweakpane';
 import vertex from './shaders/vertex.glsl'
 import fragment from './shaders/fragment.glsl'
@@ -149,27 +149,34 @@ export default class Sketch{
             format: 'png',
         }
         const exportFolder = this.pane.addFolder({
-            title: 'Export to Imgs',
+            title: 'Export',
             expanded: true,
         });
         exportFolder.addInput(this.PARAMS_EXPORT, 'frameRate',{min: 10, max: 60, step:1});
-        // exportFolder.addInput(this.PARAMS_EXPORT, 'format',{
-        //     options: {
-        //         Imgs: 'png',
-        //         Video: 'webm',
-        //         Gif: 'gif'
-        //     }
-        // });
-        // exportFolder.addSeparator();
-        exportFolder.addButton({title: 'Start'}).on('click', (ev)=>{
-            this.addCapture();
-        })
-        exportFolder.addButton({title: 'Stop & Save'}).on('click', (ev)=>{
+        exportFolder.addInput(this.PARAMS_EXPORT, 'format',{
+            options: {
+                Imgs: 'png',
+                Video: 'webm',
+                // Gif: 'gif'
+            }
+        });
+        exportFolder.addSeparator();
+        const btnStart = exportFolder.addButton({title: 'Start'})
+        
+        const btnStop = exportFolder.addButton({title: 'Stop & Save', disabled: true})
+        
+        btnStop.on('click', (ev)=>{
             if (this.capturer){
                 this.capturer.stop();
                 this.onCapture = false;
                 this.capturer.save();
             }
+            btnStart.disabled = false;
+        })
+        btnStart.on('click', (ev)=>{
+            this.addCapture();
+            btnStop.disabled = false;
+            btnStart.disabled = true;
         })
     }
 
@@ -177,13 +184,13 @@ export default class Sketch{
         this.capturer = new CCapture({
             framerate: this.PARAMS_EXPORT.frameRate,
             verbose: false,
-            format: 'png',
+            format: this.PARAMS_EXPORT.format,
             // display: true,
             autoSaveTime: 0,
             timeLimit: 4,
             frameLimit: 0,
             quality: 99,
-            workersPath: './',
+            workersPath: './lib/',
         })
         this.capturer.start();
         this.onCapture = true;
