@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import {CCapture} from 'ccapture.js';
 import {Pane} from 'tweakpane';
 import vertex from './shaders/vertex.glsl'
 import fragment from './shaders/fragment.glsl'
@@ -6,15 +7,17 @@ import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 
-// let OrbitControls = require("three/examples/jsm/controls/OrbitControls").OrbitControls
+let OrbitControls = require("three/examples/jsm/controls/OrbitControls").OrbitControls
 
 export default class Sketch{
     constructor(){
+        
+        this.onCapture = false;
         this.container = document.getElementById('container');
         this.width = this.container.offsetWidth;
         this.height = this.container.offsetHeight;
 
-        this.renderer = new THREE.WebGLRenderer( { antialias: true } );
+        this.renderer = new THREE.WebGLRenderer( { antialias: true, preserveDrawingBuffer: true } );
         this.renderer.setPixelRatio(window.devicePixelRatio);
         this.renderer.setSize( this.width, this.height );
         this.renderer.setClearColor(0x000000,1)
@@ -34,7 +37,7 @@ export default class Sketch{
        
 
         this.scene = new THREE.Scene();
-        // this.control = new OrbitControls(this.camera, this.renderer.domElement)
+        this.control = new OrbitControls(this.camera, this.renderer.domElement)
         this.time = 0;
         this.mouse = 0;
         this.mouseX = 0;
@@ -63,6 +66,8 @@ export default class Sketch{
         })
     }
 
+
+
     addPost(){
         this.params = {
             exposure: 1,
@@ -87,9 +92,6 @@ export default class Sketch{
 
     settings(){
         this.pane = new Pane();
-        
-
-
         this.PARAMS = {
             exposure: 1,
             strength: 2.5,
@@ -119,6 +121,16 @@ export default class Sketch{
         colorFolder.addInput(this.PARAMS, 'z',{min: -1, max: 1}).on('change', (ev)=>{this.material.uniforms.uTrans.value.z = ev.value;});
         colorFolder.addInput(this.PARAMS, 'scale',{min: 0, max: 1}).on('change', (ev)=>{this.material.uniforms.uScale.value = ev.value;});
 
+        const vertexFolder = this.pane.addFolder({
+            title: 'Vertex',
+            expanded: true,
+        });
+          
+        vertexFolder.addInput(this.PARAMS, 'speed',{min: 0, max: 5}).on('change', (ev)=>{this.material.uniforms.uSpeed.value = ev.value;});
+        vertexFolder.addInput(this.PARAMS, 'amplitude').on('change', (ev)=>{this.material.uniforms.uAmplitude.value = ev.value;});
+
+        vertexFolder.addInput(this.PARAMS, 'rotate',{min: -5, max: 5}).on('change', (ev)=>{this.rotateSpeed = ev.value;});
+
         const bloomFolder = this.pane.addFolder({
             title: 'Bloom',
             expanded: true,
@@ -129,15 +141,53 @@ export default class Sketch{
         // f.addInput(this.PARAMS, 'bloomThreshold').on('change', (ev)=>{this.bloomPass.threshold = ev.value;});
         bloomFolder.addInput(this.PARAMS, 'radius',{min: 0, max: 5}).on('change', (ev)=>{this.bloomPass.radius = ev.value;});
 
-        const vertexFolder = this.pane.addFolder({
-            title: 'Vertex',
+        
+
+
+        this.PARAMS_EXPORT = {
+            frameRate: 25,
+            format: 'png',
+        }
+        const exportFolder = this.pane.addFolder({
+            title: 'Export to Imgs',
             expanded: true,
         });
-          
-        vertexFolder.addInput(this.PARAMS, 'speed',{min: 0, max: 5}).on('change', (ev)=>{this.material.uniforms.uSpeed.value = ev.value;});
-        vertexFolder.addInput(this.PARAMS, 'amplitude').on('change', (ev)=>{this.material.uniforms.uAmplitude.value = ev.value;});
+        exportFolder.addInput(this.PARAMS_EXPORT, 'frameRate',{min: 10, max: 60, step:1});
+        // exportFolder.addInput(this.PARAMS_EXPORT, 'format',{
+        //     options: {
+        //         Imgs: 'png',
+        //         Video: 'webm',
+        //         Gif: 'gif'
+        //     }
+        // });
+        // exportFolder.addSeparator();
+        exportFolder.addButton({title: 'Start'}).on('click', (ev)=>{
+            this.addCapture();
+        })
+        exportFolder.addButton({title: 'Stop & Save'}).on('click', (ev)=>{
+            if (this.capturer){
+                this.capturer.stop();
+                this.onCapture = false;
+                this.capturer.save();
+            }
+        })
+    }
 
-        this.pane.addInput(this.PARAMS, 'rotate',{min: -5, max: 5}).on('change', (ev)=>{this.rotateSpeed = ev.value;});
+    addCapture(){
+        this.capturer = new CCapture({
+            framerate: this.PARAMS_EXPORT.frameRate,
+            verbose: false,
+            format: 'png',
+            // display: true,
+            autoSaveTime: 0,
+            timeLimit: 4,
+            frameLimit: 0,
+            quality: 99,
+            workersPath: './',
+        })
+        this.capturer.start();
+        this.onCapture = true;
+        
     }
 
     addMesh(){
@@ -203,6 +253,7 @@ export default class Sketch{
         this.composer.render();
         
         window.requestAnimationFrame(this.render.bind(this))
+        if (this.onCapture) this.capturer.capture(this.renderer.domElement);
     }
 }
 

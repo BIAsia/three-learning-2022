@@ -10,12 +10,14 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "ccapture.js": "github:aceslowman/ccapture.js#npm-fix",
     "parcel": "^2.5.0",
     "three": "^0.140.0",
     "tweakpane": "^3.0.8"
   },
   "devDependencies": {
     "@parcel/transformer-glsl": "^2.5.0",
-    "@tweakpane/core": "^1.0.9"
+    "@tweakpane/core": "^1.0.9",
+    "buffer": "^6.0.3"
   }
 }
