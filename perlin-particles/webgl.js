@@ -105,6 +105,8 @@ export default class Sketch{
             y: 1,
             z: 0,
             rotate: 1,
+            density: 36,
+            size: 20.,
         };
 
         
@@ -125,11 +127,14 @@ export default class Sketch{
             title: 'Vertex',
             expanded: true,
         });
-          
+        
+        vertexFolder.addInput(this.PARAMS, 'density',{min: 1, max: 50, step:1}).on('change', (ev)=>{this.updateMesh(ev.value)});
+        vertexFolder.addInput(this.PARAMS, 'size',{min: 10, max: 100}).on('change', (ev)=>{this.material.uniforms.uSize.value = ev.value;});
         vertexFolder.addInput(this.PARAMS, 'speed',{min: 0, max: 5}).on('change', (ev)=>{this.material.uniforms.uSpeed.value = ev.value;});
         vertexFolder.addInput(this.PARAMS, 'amplitude').on('change', (ev)=>{this.material.uniforms.uAmplitude.value = ev.value;});
 
         vertexFolder.addInput(this.PARAMS, 'rotate',{min: -5, max: 5}).on('change', (ev)=>{this.rotateSpeed = ev.value;});
+        
 
         const bloomFolder = this.pane.addFolder({
             title: 'Bloom',
@@ -212,6 +217,7 @@ export default class Sketch{
                 uRGB: {value: {r:0, g:178, b:230}},
                 uScale: {value: .4},
                 uTrans: {value: {x:0, y:1, z:0}},
+                uSize: {value: 20.}
             },
             side: THREE.DoubleSide,
             transparent: true,
@@ -230,6 +236,19 @@ export default class Sketch{
         this.geometry.addAttribute('aRandom', new Float32Array(this.rand), 1)
 
         this.mesh = new THREE.Points( this.geometry, this.material );
+        this.scene.add( this.mesh );
+    }
+
+    updateMesh(numbers){
+        this.geometry = new THREE.IcosahedronBufferGeometry(1,numbers);
+        this.rand = []
+        this.length = this.geometry.attributes.position.count;
+        for (let i = 0; i < this.length; i++) {
+            this.rand.push(Math.random());
+        }
+        this.geometry.addAttribute('aRandom', new Float32Array(this.rand), 1);
+        this.mesh = new THREE.Points( this.geometry, this.material );
+        this.scene.clear();
         this.scene.add( this.mesh );
     }
 

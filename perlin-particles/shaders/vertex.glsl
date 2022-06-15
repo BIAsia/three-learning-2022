@@ -16,6 +16,7 @@ uniform float uAmplitude;
 uniform vec3 uRGB;
 uniform float uScale;
 uniform vec3 uTrans;
+uniform float uSize;
 
 
 //	Simplex 3D Noise 
@@ -169,6 +170,6 @@ void main() {
 
   vec4 mvPosition = modelViewMatrix * vec4( newPosition, 1.0 );
   gl_Position = projectionMatrix * mvPosition;
-  gl_PointSize = (20.-dist*5.) / (1. -mvPosition.z);
+  gl_PointSize = (uSize-dist*5.) / (1. -mvPosition.z);
   // gl_PointSize = step(1.-(1./512.), newPosition.x) * 3.;
 }
