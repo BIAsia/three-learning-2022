@@ -1,0 +1,20 @@
+{
+    "rgb": {
+        "r": 0,
+        "g": 178,
+        "b": 230
+    },
+    "x": 0,
+    "y": 1,
+    "z": 0,
+    "scale": 0.4,
+    "density": 36,
+    "size": 20,
+    "speed": 2,
+    "amplitude": 10.5,
+    "rotate": 1,
+    "strength": 2.5,
+    "radius": 0.5,
+    "frameRate": 25,
+    "format": "png"
+}

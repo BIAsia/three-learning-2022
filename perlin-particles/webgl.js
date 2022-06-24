@@ -1,6 +1,9 @@
 import * as THREE from 'three';
+import * as fs from 'fs';
 import {CCapture} from 'ccapture.js-npmfixed';
 import {Pane} from 'tweakpane';
+import JSZip from 'jszip';
+import FileSaver from 'file-saver'; 
 import vertex from './shaders/vertex.glsl'
 import fragment from './shaders/fragment.glsl'
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
@@ -8,6 +11,7 @@ import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 
 let OrbitControls = require("three/examples/jsm/controls/OrbitControls").OrbitControls
+
 
 export default class Sketch{
     constructor(){
@@ -153,22 +157,22 @@ export default class Sketch{
             frameRate: 25,
             format: 'png',
         }
-        const exportFolder = this.pane.addFolder({
-            title: 'Export',
+        const recordFolder = this.pane.addFolder({
+            title: 'Record',
             expanded: true,
         });
-        exportFolder.addInput(this.PARAMS_EXPORT, 'frameRate',{min: 10, max: 60, step:1});
-        exportFolder.addInput(this.PARAMS_EXPORT, 'format',{
+        recordFolder.addInput(this.PARAMS_EXPORT, 'frameRate',{min: 10, max: 60, step:1});
+        recordFolder.addInput(this.PARAMS_EXPORT, 'format',{
             options: {
                 Imgs: 'png',
                 Video: 'webm',
                 // Gif: 'gif'
             }
         });
-        exportFolder.addSeparator();
-        const btnStart = exportFolder.addButton({title: 'Start'})
+        recordFolder.addSeparator();
+        const btnStart = recordFolder.addButton({title: 'Start Recording'})
         
-        const btnStop = exportFolder.addButton({title: 'Stop & Save', disabled: true})
+        const btnStop = recordFolder.addButton({title: 'Stop Recording', disabled: true})
         
         btnStop.on('click', (ev)=>{
             if (this.capturer){
@@ -183,6 +187,58 @@ export default class Sketch{
             btnStop.disabled = false;
             btnStart.disabled = true;
         })
+
+        const exportFolder = this.pane.addFolder({
+            title: 'Export',
+            expanded: true,
+        });
+        exportFolder.addButton({title: 'Export Parameters'}).on('click', (ev)=>{
+            const preset = this.pane.exportPreset();
+            var blob = new Blob([JSON.stringify(preset)], {type: "text/plain;charset=utf-8"});
+            FileSaver.saveAs(blob, "parameters.JSON");
+        });
+        exportFolder.addButton({title: 'Export Code'}).on('click', (ev)=>{
+            const indexFile = fs.readFileSync('./export/index.html', {encoding: 'utf-8'});
+            const packageFile = fs.readFileSync('./export/package.json', {encoding: 'utf-8'});
+            const readFile = fs.readFileSync('./export/README.md', {encoding: 'utf-8'});
+            const jsFile = fs.readFileSync('./export/webgl.js', {encoding: 'utf-8'});
+            const vertexFile = fs.readFileSync('./shaders/vertex.glsl', {encoding: 'utf-8'});
+            const fragFile = fs.readFileSync('./shaders/fragment.glsl', {encoding: 'utf-8'});
+            const preset = this.pane.exportPreset();
+            var blob = new Blob([JSON.stringify(preset)], {type: "text/plain;charset=utf-8"});
+
+            var zip = new JSZip();
+            zip.file("index.html", indexFile);
+            zip.file("package.json", packageFile);
+            zip.file("README.md", readFile);
+            zip.file("webgl.js", jsFile);
+            zip.file("parameters.json", blob);
+            var shaderFolder = zip.folder("shaders");
+            shaderFolder.file("vertex.glsl", vertexFile);
+            shaderFolder.file("fragment.glsl", fragFile);
+            zip.generateAsync({type:"blob"})
+            .then(function(content) {
+                // see FileSaver.js
+                FileSaver.saveAs(content, "example.zip");
+            });
+
+            // const indexCode = document.documentElement.outerHTML;
+            // var blob = new Blob([code], {type: "text/plain;charset=utf-8"});
+            // FileSaver.saveAs(blob, "index.html");
+
+            // const jsCode = document.getElementById('webgl').text;
+            // var blob = new Blob([jsCode], {type: "text/plain;charset=utf-8"});
+            // FileSaver.saveAs(blob, "webgl.js");
+            // const fileIndex = fs.readFile("./export/index.html")
+            // const filePackage = fs.readFile("./export/package.json")
+            // console.log('read' + fileIndex)
+
+            
+
+            // const preset = this.pane.exportPreset();
+            // this.createDownload(JSON.stringify(preset), 'parameters.JSON')
+        });
+
     }
 
     addCapture(){

@@ -5,21 +5,16 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "rm -rf ./dist; rm -rf ./.parcel-cache; parcel serve index.html --port 8888 --open",
-    "build": "rm -rf ./dist; parcel build index.html --public-url '.' --no-source-maps;parcel serve index.html --port 8888"
+    "build": "rm -rf ./dist; parcel build index.html --public-url '.' --no-source-maps;parcel serve index.html --port 9999"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "ccapture.js-npmfixed": "^1.1.0",
-    "file-saver": "^2.0.5",
-    "jszip": "^3.10.0",
     "parcel": "^2.5.0",
-    "three": "^0.140.0",
-    "tweakpane": "^3.0.8"
+    "three": "^0.140.0"
   },
   "devDependencies": {
     "@parcel/transformer-glsl": "^2.5.0",
-    "@tweakpane/core": "^1.0.9",
     "buffer": "^6.0.3",
     "process": "^0.11.10"
   }
