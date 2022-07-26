@@ -63,6 +63,8 @@ void main() {
     // vec3 color1 = vec3(155./255., 206./255., 203./255.);
     // vec3 color2 = vec3(206./255., 221./255., 220./255.);
 
+    
+
     // colors: from pane
     vec3 color1 = vec3(uColorA/255.);
     vec3 color2 = vec3(uColorB/255.);
@@ -73,6 +75,10 @@ void main() {
 
     // noise changed with time
     float n = noise(vPosition + uTime);
+
+    // make color change through time
+    color2 += vec3(cos(uTime*2)*0.01);
+
     
     // make line shape texture
     vec2 baseUV = rotate2D(n)*vPosition.xy*.1*(noise(vPosition)+uSpeed*0.5);

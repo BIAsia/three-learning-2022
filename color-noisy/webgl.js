@@ -46,9 +46,16 @@ export default class Sketch{
         this.time = 0;
         this.mouse = 0;
         this.speed = 0;
+        
 
         const palettesFile = fs.readFileSync('./palettes.json', {encoding: 'utf-8'});
         this.palettes = JSON.parse(palettesFile)
+        this.preset = {
+            colorA: {r:155, g:206, b:203},
+            colorB: {r:206, g:221, b:220},
+            colorC: {r:162, g:189, b:193},
+        }
+        this.pressPalette = this.palettes[15]
 
         this.addTCube();
 
@@ -185,9 +192,9 @@ export default class Sketch{
         this.pane.addButton({title: 'Random Palette'}).on('click', (ev)=>{
             let num = Math.floor(Math.random()*100);
             num = num%(this.palettes.length)
-            console.log(num)
-            const preset = this.palettes[num];
-            this.pane.importPreset(preset);
+
+            this.preset = this.palettes[num];
+            this.pane.importPreset(this.preset);
         });
 
         const colorFolder = this.pane.addFolder({
