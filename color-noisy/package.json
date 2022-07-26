@@ -4,18 +4,20 @@
   "description": "",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "parcel serve index.html --port 8888 --open",
+    "start": "parcel serve index.html --port 10012 --open",
     "build": "rm -rf ./dist; parcel build index.html --public-url '.' --no-source-maps;parcel serve index.html --port 8888"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "file-saver": "^2.0.5",
     "gsap": "^3.10.4",
     "parcel": "^2.5.0",
     "three": "^0.140.0",
     "tweakpane": "^3.1.0"
   },
   "devDependencies": {
-    "@parcel/transformer-glsl": "^2.5.0"
+    "@parcel/transformer-glsl": "^2.5.0",
+    "buffer": "^6.0.3"
   }
 }

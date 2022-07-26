@@ -1,5 +1,9 @@
 import * as THREE from 'three';
-import gsap from 'gsap';
+import * as fs from 'fs';
+import gsap, { random } from 'gsap';
+import {Pane} from 'tweakpane';
+import FileSaver from 'file-saver'; 
+
 import vertex from './shaders/vertex.glsl'
 import vertexRefract from './shaders/vertexRefract.glsl'
 import fragment from './shaders/fragment.glsl'
@@ -12,6 +16,7 @@ import { PostProcessing } from './PostProcessing.js';
 import { Vector3 } from 'three';
 
 let OrbitControls = require("three/examples/jsm/controls/OrbitControls").OrbitControls
+
 
 export default class Sketch{
     constructor(){
@@ -42,9 +47,13 @@ export default class Sketch{
         this.mouse = 0;
         this.speed = 0;
 
+        const palettesFile = fs.readFileSync('./palettes.json', {encoding: 'utf-8'});
+        this.palettes = JSON.parse(palettesFile)
+
         this.addTCube();
 
         this.addMesh();
+        this.settings();
         this.mouseEvent();
         
         this.addPost();
@@ -122,6 +131,9 @@ export default class Sketch{
                 landscape: {value: this.texture},
                 uTime: {value: 0},
                 uSpeed: {value: this.speed},
+                uColorA: {value: {r:155, g:206, b:203}},
+                uColorB: {value: {r:206, g:221, b:220}},
+                uColorC: {value: {r:162, g:189, b:193}},
                 // uSize: {value: 6.0},
                 // uScale: {value: 0}
             },
@@ -147,6 +159,9 @@ export default class Sketch{
                 landscape: {value: this.texture},
                 uTime: {value: 0},
                 uSpeed: {value: this.speed},
+                uColorA: {value: {r:155, g:206, b:203}},
+                uColorB: {value: {r:206, g:221, b:220}},
+                uColorC: {value: {r:162, g:189, b:193}},
                 // uSize: {value: 6.0},
                 // uScale: {value: 0}
             },
@@ -158,6 +173,42 @@ export default class Sketch{
         this.meshRefract = new THREE.Mesh( this.geometryRefract, this.materialRefract );
         this.scene.add( this.meshRefract );
         this.meshRefract.position.set(0.2,-0.3,0.8)
+    }
+
+    settings(){
+        this.pane = new Pane();
+        this.PARAMS = {
+            colorA: {r:155, g:206, b:203},
+            colorB: {r:206, g:221, b:220},
+            colorC: {r:162, g:189, b:193},
+        }
+        this.pane.addButton({title: 'Random Palette'}).on('click', (ev)=>{
+            let num = Math.floor(Math.random()*100);
+            num = num%(this.palettes.length)
+            console.log(num)
+            const preset = this.palettes[num];
+            this.pane.importPreset(preset);
+        });
+
+        const colorFolder = this.pane.addFolder({
+            title: 'Color',
+            expanded: true,
+        });
+
+        colorFolder.addInput(this.PARAMS, 'colorA').on('change', (ev)=>{this.material.uniforms.uColorA.value = ev.value;});
+        colorFolder.addInput(this.PARAMS, 'colorB').on('change', (ev)=>{this.material.uniforms.uColorB.value = ev.value;});
+        colorFolder.addInput(this.PARAMS, 'colorC').on('change', (ev)=>{this.material.uniforms.uColorC.value = ev.value;});
+
+        // const exportFolder = this.pane.addFolder({
+        //     title: 'Export',
+        //     expanded: true,
+        // });
+        this.pane.addButton({title: 'Export Parameters'}).on('click', (ev)=>{
+            const preset = this.pane.exportPreset();
+            var blob = new Blob([JSON.stringify(preset)], {type: "text/plain;charset=utf-8"});
+            FileSaver.saveAs(blob, "parameters.JSON");
+        });
+        
     }
 
     setupResize(){
