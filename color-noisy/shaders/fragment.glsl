@@ -3,6 +3,7 @@ varying vec2 vUV;
 varying vec3 vNormal;
 
 uniform float uTime;
+uniform float uSpeed;
 
 float mod289(float x){return x - floor(x * (1.0 / 289.0)) * 289.0;}
 vec4 mod289(vec4 x){return x - floor(x * (1.0 / 289.0)) * 289.0;}
@@ -63,7 +64,8 @@ void main() {
     float n = noise(vPosition + uTime);
     
     // make line shape texture
-    vec2 baseUV = rotate2D(n)*vPosition.xy*.1;
+    vec2 baseUV = rotate2D(n)*vPosition.xy*.1*(noise(vPosition)+uSpeed*0.5);
+    // baseUV = (vPosition.xx+uTime*0.1)*.15*(noise(vPosition)+uSpeed*0.1);
     float basePattern = lines(baseUV, .5);
     float secondPattern = lines(baseUV, .1);
 

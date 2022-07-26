@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import gsap from 'gsap';
 import vertex from './shaders/vertex.glsl'
 import vertexRefract from './shaders/vertexRefract.glsl'
 import fragment from './shaders/fragment.glsl'
@@ -8,6 +9,7 @@ import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { PostProcessing } from './PostProcessing.js';
+import { Vector3 } from 'three';
 
 let OrbitControls = require("three/examples/jsm/controls/OrbitControls").OrbitControls
 
@@ -38,6 +40,7 @@ export default class Sketch{
         this.control = new OrbitControls(this.camera, this.renderer.domElement)
         this.time = 0;
         this.mouse = 0;
+        this.speed = 0;
 
         this.addTCube();
 
@@ -53,6 +56,31 @@ export default class Sketch{
     mouseEvent(){
         document.addEventListener('mousemove', (e)=>{
             // mousemove
+        })
+        this.lastX = 0;
+        this.lastY = 0;
+        document.addEventListener('mousedown', (e)=>{
+            this.moveOn();
+        })
+        document.addEventListener('mouseup', (e)=>{
+            this.moveBack();
+        })
+    }
+
+    moveOn(){
+        gsap.to(this.material.uniforms['uSpeed'], {
+            value: 4,
+            duration: 4,
+            delay: 0,
+            ease: "power2.out",
+        })
+    }
+    moveBack(){
+        gsap.to(this.material.uniforms['uSpeed'], {
+            value: 0,
+            duration: 4,
+            delay: 0,
+            ease: "power2.out",
         })
     }
 
@@ -93,6 +121,7 @@ export default class Sketch{
                 // progress: {type: "f", value: 0},
                 landscape: {value: this.texture},
                 uTime: {value: 0},
+                uSpeed: {value: this.speed},
                 // uSize: {value: 6.0},
                 // uScale: {value: 0}
             },
@@ -106,6 +135,7 @@ export default class Sketch{
 
 
         this.geometryRefract = new THREE.SphereBufferGeometry(0.4, 32, 32);
+        this.geometryRefract.position = new Vector3(1000,100,1000)
         this.materialRefract = new THREE.ShaderMaterial({
             vertexShader: vertexRefract,
             fragmentShader: fragmentRefract,
@@ -116,6 +146,7 @@ export default class Sketch{
                 // progress: {type: "f", value: 0},
                 landscape: {value: this.texture},
                 uTime: {value: 0},
+                uSpeed: {value: this.speed},
                 // uSize: {value: 6.0},
                 // uScale: {value: 0}
             },
@@ -126,6 +157,7 @@ export default class Sketch{
         
         this.meshRefract = new THREE.Mesh( this.geometryRefract, this.materialRefract );
         this.scene.add( this.meshRefract );
+        this.meshRefract.position.set(0.2,-0.3,0.8)
     }
 
     setupResize(){
@@ -141,14 +173,15 @@ export default class Sketch{
 
     render(){
         this.time++;
+        this.speed *= 0.99;
         
         this.meshRefract.visible = false;
         this.cubeCamera.update(this.renderer, this.scene);
         this.materialRefract.uniforms['tCube'].value = this.cubeRenderTarget.texture;
         this.meshRefract.visible = true;
 
-        this.scene.rotation.x = this.time / 2000;
-	    this.scene.rotation.y = this.time / 1000;
+        // this.scene.rotation.x = this.time / 2000;
+	    // this.scene.rotation.y = this.time / 1000;
         this.material.uniforms['uTime'].value = this.time*.008;
         this.customPass.uniforms[ 'time' ].value = this.time;
 
