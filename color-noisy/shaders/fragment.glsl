@@ -77,11 +77,11 @@ void main() {
     float n = noise(vPosition + uTime);
 
     // make color change through time
-    color2 += vec3(cos(uTime*2)*0.01);
+    color2 += vec3(cos(uTime*2.)*0.05);
 
     
     // make line shape texture
-    vec2 baseUV = rotate2D(n)*vPosition.xy*.1*(noise(vPosition)+uSpeed*0.5);
+    vec2 baseUV = rotate2D(n)*vPosition.xy*0.1*(noise(vPosition)+uSpeed*0.5);
     // baseUV = (vPosition.xx+uTime*0.1)*.15*(noise(vPosition)+uSpeed*0.1);
     float basePattern = lines(baseUV, .5);
     float secondPattern = lines(baseUV, .1);

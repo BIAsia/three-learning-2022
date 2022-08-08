@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import * as fs from 'fs';
-import gsap, { random } from 'gsap';
+import gsap from 'gsap';
 import {Pane} from 'tweakpane';
 import FileSaver from 'file-saver'; 
 
@@ -72,6 +72,7 @@ export default class Sketch{
     mouseEvent(){
         document.addEventListener('mousemove', (e)=>{
             // mousemove
+            
         })
         this.lastX = 0;
         this.lastY = 0;
@@ -136,11 +137,11 @@ export default class Sketch{
                 uMouse: {value: 0},
                 // progress: {type: "f", value: 0},
                 landscape: {value: this.texture},
-                uTime: {value: 0},
+                uTime: {value: 0.},
                 uSpeed: {value: this.speed},
-                uColorA: {value: {r:155, g:206, b:203}},
-                uColorB: {value: {r:206, g:221, b:220}},
-                uColorC: {value: {r:162, g:189, b:193}},
+                uColorA: {value: {r:155., g:206., b:203.}},
+                uColorB: {value: {r:206., g:221., b:220.}},
+                uColorC: {value: {r:162., g:189., b:193.}},
                 // uSize: {value: 6.0},
                 // uScale: {value: 0}
             },
@@ -164,11 +165,11 @@ export default class Sketch{
                 tCube: {value: 0},
                 // progress: {type: "f", value: 0},
                 landscape: {value: this.texture},
-                uTime: {value: 0},
+                uTime: {value: 0.},
                 uSpeed: {value: this.speed},
-                uColorA: {value: {r:155, g:206, b:203}},
-                uColorB: {value: {r:206, g:221, b:220}},
-                uColorC: {value: {r:162, g:189, b:193}},
+                uColorA: {value: {r:155., g:206., b:203.}},
+                uColorB: {value: {r:206., g:221., b:220.}},
+                uColorC: {value: {r:162., g:189., b:193.}},
                 // uSize: {value: 6.0},
                 // uScale: {value: 0}
             },
